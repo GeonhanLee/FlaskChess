@@ -1,5 +1,6 @@
 from flask import Flask, render_template
 from chess_engine import *
+import torch
 
 app = Flask(__name__)
 
@@ -10,12 +11,11 @@ def index():
 
 @app.route('/move/<int:depth>/<path:fen>/')
 def get_move(depth, fen):
+    print(fen)
     print(depth)
     print("Calculating...")
     engine = Engine(fen)
-    move = engine.iterative_deepening(depth - 1)
-    print("Move found!", move)
-    print()
+    move = engine.select_move()
     return move
 
 
