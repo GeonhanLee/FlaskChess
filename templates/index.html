@@ -61,18 +61,17 @@
                             <form class="form-inline">
                                 <button type="button" class="btn btn-default" id="backBtn" onclick="takeBack()";>Take Back</button>
                                 <button type="button" class="btn btn-default" id="reset" onclick="newGame()";>New Game</button>
-                                <select class="form-control" id="sel1">
-                                    <option value="5">Depth: 5</option>
-                                    <option value="4">Depth: 4</option>
-                                    <option value="3">Depth: 3</option>
-                                    <option value="2">Depth: 2</option>
-                                    <option value="1">Depth: 1</option>
-                                </select>
+                                <div id="winProbability"></div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+            function updateWinProbability(probability) {
+                $("#winProbability").text("Black Win Probability: " + probability + "%");
+            }
+        </script>
     </body>
 </html>

@@ -4,58 +4,55 @@ import signal
 import time
 import cProfile
 import torch
+import torch.nn as nn
 import numpy
-from create_dataset import chess_board_to_image
+from create_dataset import chess_board_to_text
+from chess_model import LSTM
 
 class Engine:
     def __init__(self, fen):
         self.board = chess.Board()
         self.board.set_fen(fen)
-        self.model = torch.load("model2.pt")
+        self.model = torch.load("model3-1.pt")
 
     def random_response(self):
         response = random.choice(list(self.board.legal_moves))
         return str(response)
 
     def select_move(self):
+        move, val = self.calculate()
+        return str(move)
+
+    def calculate_win_probability(self):
+        move, val = self.calculate()
+        return val
+
+    def calculate(self):
         legal_moves = list(self.board.legal_moves)
 
         best_move = legal_moves[0]
-        max_index = 0
         max_val = -999
 
         for move in legal_moves:
             self.board.push(move)
 
             # do the calculation
-            tensor = chess_board_to_image(str(self.board))
-            tensor.unsqueeze_(0)
+            tensor = chess_board_to_text(str(self.board))
+            tensor = tensor.unsqueeze_(0)
             predictions = self.model(tensor.to('cuda'))
-
+            print(predictions)
             predictions = torch.nn.functional.softmax(predictions, dim=1)
             np_arr = predictions.detach().cpu().numpy()
             np_arr = np_arr[0].tolist()
             print(np_arr)
-
-            win_prob = np_arr[:5]
-            lose_prob = np_arr[5:]
-
-            cur_val = 0
-            for idx, var in enumerate(win_prob):
-                cur_val += (idx+1) * var
-            for idx, var in enumerate(lose_prob):
-                cur_val -= (idx+1) * var
-
-            print(cur_val)
+            cur_val = np_arr[0]
 
             if cur_val > max_val:
                 max_val = cur_val
                 best_move = move
-
             self.board.pop()
-
-        return str(best_move)
-
+        print(max_val)
+        return str(best_move), max_val * 100
 
 
 # This is being used for testing at the moment, which is why there is so much commented code.

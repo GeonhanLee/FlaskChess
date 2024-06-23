@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 from chess_engine import *
 import torch
 
@@ -18,6 +18,12 @@ def get_move(depth, fen):
     move = engine.select_move()
     return move
 
+@app.route('/get_win_probability/<path:fen>/')
+def get_win_probability(fen):
+    print("hellllo?")
+    engine = Engine(fen)
+    win_probability = engine.calculate_win_probability()
+    return jsonify({'winProbability': win_probability})
 
 @app.route('/test/<string:tester>')
 def test_get(tester):

@@ -92,15 +92,20 @@ var randomResponse = function() {
 }
 
 var getResponseMove = function() {
-    var e = document.getElementById("sel1");
-    var depth = e.options[e.selectedIndex].value;
+    //var e = document.getElementById("sel1");
+    //var depth = e.options[e.selectedIndex].value;
     fen = game.fen()
-    $.get($SCRIPT_ROOT + "/move/" + depth + "/" + fen, function(data) {
+    $.get($SCRIPT_ROOT + "/move/" + 0 + "/" + fen, function(data) {
         game.move(data, {sloppy: true});
         updateStatus();
         // This is terrible and I should feel bad. Find some way to fix this properly.
         // The animations would stutter when moves were returned too quick, so I added a 100ms delay before the animation
         setTimeout(function(){ board.position(game.fen()); }, 100);
+
+        // Fetch and Update Win Probability
+        $.get($SCRIPT_ROOT + "/get_win_probability/" + fen, function(data) {
+            updateWinProbability(data.winProbability); // Update UI
+        });
     })
 }
 
